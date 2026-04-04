@@ -6,8 +6,8 @@ const ASSETS = [
   'todo-list.html',
   'focus-timer.html',
   'manifest.json',
-  'icon.png',          // Ensure these icons actually exist!
-  'icon-512.png'
+  'icon192/192.png',          // Ensure these icons actually exist!
+  'icon512/512.png'
 ];
 
 self.addEventListener('install', (event) => {
