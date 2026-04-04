@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIZO - Budget Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#5f81b6">
+    <link rel="icon" href="icon192/192.png" />
+    
+    <style>
+        /* --- CSS STYLING --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        body { background-color: #a4c5e3; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        
+        .navbar { background-color: #5f81b6; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; color: white; z-index: 10; }
+        .icon-btn { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+        .logo { font-size: 22px; letter-spacing: 1px; font-weight: bold; }
+
+        .container { margin-top: 30px; width: 100%; max-width: 400px; padding: 0 20px; display: flex; flex-direction: column; gap: 20px; }
+        
+        .summary-row { display: flex; justify-content: space-between; gap: 15px; }
+        .summary-box { background-color: #6486b8; flex: 1; padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .summary-label { font-size: 12px; font-weight: 800; letter-spacing: 1px; display: block; margin-bottom: 8px; }
+        .text-green { color: #00ff7f; } 
+        .text-red { color: #ff3b30; }   
+        .divider { border: 0; height: 1px; background: rgba(255, 255, 255, 0.3); margin-bottom: 8px; }
+        .summary-amount { color: white; font-size: 20px; font-weight: bold; }
+
+        .breakdown-box { background-color: #7998c9; border-radius: 12px; padding: 15px; min-height: 350px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; }
+        .breakdown-title { color: white; text-align: center; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .breakdown-list { list-style: none; color: white; font-size: 14px; flex-grow: 1; overflow-y: auto; }
+        .breakdown-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+
+        .action-row { display: flex; justify-content: space-between; gap: 15px; margin-top: auto; padding-bottom: 20px; }
+        .action-btn { background-color: #6486b8; border: none; flex: 1; padding: 18px 5px; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.2s ease; color: white;}
+        .action-btn:hover { background-color: #4b6a96; }
+
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: 0; left: -250px; width: 250px; height: 100%; background-color: #5f81b6; transition: left 0.3s ease; z-index: 1000; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2); }
+        .sidebar.open { left: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+        .sidebar-menu { list-style: none; margin-top: 10px; }
+        .sidebar-menu a { display: block; color: white; text-decoration: none; padding: 20px; font-size: 18px; font-weight: bold; transition: all 0.3s ease; }
+        .sidebar-menu a:hover { background-color: #7998c9; padding-left: 30px; color: #00ff7f; }
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none; z-index: 999; }
+        .sidebar-overlay.show { display: block; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1100; }
+        .modal { background-color: #f0f4f8; width: 90%; max-width: 350px; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
+        .modal-error { color: #ff3b30; font-size: 14px; font-weight: bold; margin-bottom: 15px; display: none; }
+        .modal input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-confirm { background-color: #5f81b6; color: white; }
+        .btn-cancel { background-color: #ccc; color: #333; }
+        
+        .clear-btn { background-color: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; padding: 8px; border-radius: 5px; font-size: 11px; cursor: pointer; margin-top: 10px; display: block; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>MENU</h2>
+            <button id="close-sidebar-btn" class="icon-btn">✕</button> 
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="todo-list.html">To-Do List</a></li>
+            <li><a href="focus-timer.html">Focus Timer</a></li>
+        </ul>
+    </nav>
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <header class="navbar">
+        <button id="menu-btn" class="icon-btn">☰</button>
+        <h1 class="logo">BUDGET TRACKER</h1>
+        <button class="icon-btn" id="profile-btn">👤</button>
+    </header>
+
+    <main class="container">
+        <div class="summary-row">
+            <div class="summary-box">
+                <span class="summary-label text-green">ALLOWANCE</span>
+                <hr class="divider">
+                <span class="summary-amount" id="allowance-display">₱ 0.00</span>
+            </div>
+            <div class="summary-box">
+                <span class="summary-label text-red">TOTAL EXPENSE</span>
+                <hr class="divider">
+                <span class="summary-amount" id="expense-display">₱ 0.00</span>
+            </div>
+        </div>
+
+        <div class="breakdown-box">
+            <div class="breakdown-title">BREAKDOWN</div>
+            <hr class="divider">
+            <ul class="breakdown-list" id="breakdown-list"></ul>
+            <button class="clear-btn" id="btn-clear-data">Clear All Data</button>
+        </div>
+
+        <div class="action-row">
+            <button class="action-btn text-green" id="btn-show-allowance">ADD ALLOWANCE</button>
+            <button class="action-btn text-red" id="btn-show-expense">ADD EXPENSE</button>
+        </div>
+    </main>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h3 id="modal-title">Title</h3>
+            <p id="modal-error" class="modal-error">Not enough allowance!</p>
+            <input type="text" id="input-name" placeholder="Name (e.g. Lunch)" style="display:none;">
+            <input type="number" id="input-amount" placeholder="Amount (₱)">
+            <div class="modal-buttons">
+                <button class="modal-btn btn-cancel" id="btn-modal-cancel">Cancel</button>
+                <button class="modal-btn btn-confirm" id="btn-modal-confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- SIDEBAR ---
+        const menuBtn = document.getElementById('menu-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        function openSidebar() { sidebar.classList.add('open'); sidebarOverlay.classList.add('show'); }
+        function closeSidebar() { sidebar.classList.remove('open'); sidebarOverlay.classList.remove('show'); }
+
+        menuBtn.addEventListener('click', openSidebar);
+        closeSidebarBtn.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // --- BUDGET LOGIC ---
+        let totalAllowance = 0;
+        let totalExpense = 0;
+        let transactions = []; 
+        let currentMode = ''; 
+
+        const modalOverlay = document.getElementById('modal-overlay');
+        const inputName = document.getElementById('input-name');
+        const inputAmount = document.getElementById('input-amount');
+        const modalTitle = document.getElementById('modal-title');
+        const modalError = document.getElementById('modal-error');
+        const breakdownList = document.getElementById('breakdown-list');
+        const allowanceDisplay = document.getElementById('allowance-display');
+        const expenseDisplay = document.getElementById('expense-display');
+
+        function loadData() {
+            const savedData = localStorage.getItem('budgetData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                totalAllowance = parsedData.allowance || 0;
+                totalExpense = parsedData.expense || 0;
+                transactions = parsedData.transactions || [];
+                updateUI();
+                transactions.forEach(item => renderListItem(item.name, item.amount, item.color));
+            }
+        }
+
+        function saveData() {
+            const dataToSave = { allowance: totalAllowance, expense: totalExpense, transactions: transactions };
+            localStorage.setItem('budgetData', JSON.stringify(dataToSave));
+        }
+
+        function updateUI() {
+            allowanceDisplay.innerText = `₱ ${totalAllowance.toFixed(2)}`;
+            expenseDisplay.innerText = `₱ ${totalExpense.toFixed(2)}`;
+        }
+
+        function renderListItem(name, amount, color) {
+            const li = document.createElement('li');
+            li.className = 'breakdown-item';
+            li.innerHTML = `<span>${name}</span><span style="color:${color === 'green' ? '#00ff7f' : '#ff3b30'}; font-weight:bold;">₱ ${amount.toFixed(2)}</span>`;
+            breakdownList.prepend(li); 
+        }
+
+        document.getElementById('btn-show-allowance').onclick = () => {
+            currentMode = 'allowance'; modalTitle.innerText = "Add Allowance"; inputName.style.display = 'none';
+            inputAmount.value = ''; modalError.style.display = 'none'; modalOverlay.style.display = 'flex';
+        };
+
+        document.getElementById('btn-show-expense').onclick = () => {
+            currentMode = 'expense'; modalTitle.innerText = "Add Expense"; inputName.style.display = 'block';
+            inputName.value = ''; inputAmount.value = ''; modalError.style.display = 'none'; modalOverlay.style.display = 'flex';
+        };
+
+        document.getElementById('btn-modal-cancel').onclick = () => modalOverlay.style.display = 'none';
+
+        document.getElementById('btn-modal-confirm').onclick = () => {
+            modalError.style.display = 'none';
+            const amount = parseFloat(inputAmount.value);
+            if (isNaN(amount) || amount <= 0) return;
+
+            if (currentMode === 'allowance') {
+                totalAllowance += amount;
+                const entry = { name: "Allowance Added", amount: amount, color: "green" };
+                transactions.push(entry);
+                renderListItem(entry.name, amount, entry.color);
+            } else {
+                const name = inputName.value.trim() || "Expense";
+                if (amount > totalAllowance) { modalError.style.display = 'block'; return; }
+                totalExpense += amount; 
+                totalAllowance -= amount;
+                const entry = { name: name, amount: amount, color: "red" };
+                transactions.push(entry);
+                renderListItem(entry.name, amount, entry.color);
+            }
+            updateUI();
+            saveData(); 
+            modalOverlay.style.display = 'none';
+        };
+
+        document.getElementById('btn-clear-data').onclick = () => {
+            if (confirm("Clear all data?")) {
+                localStorage.removeItem('budgetData');
+                totalAllowance = 0; totalExpense = 0; transactions = [];
+                updateUI();
+                breakdownList.innerHTML = '';
+            }
+        };
+
+        // --- SERVICE WORKER REGISTRATION ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Budget SW Registered!', reg))
+                    .catch(err => console.error('Budget SW Failed:', err));
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
