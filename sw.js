@@ -7,7 +7,7 @@ const ASSETS = [
   'focus-timer.html',
   'manifest.json',
   'icon192/192.png',          // Ensure these icons actually exist!
-  'icon512/512.png'
+  'icon512/512.png' 
 ];
 
 self.addEventListener('install', (event) => {
