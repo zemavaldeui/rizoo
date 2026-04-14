@@ -2,74 +2,165 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RIZO</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#5f81b6">
-    <link rel="icon" href="icon/icon192/192.png" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RIZO - Focus Timer</title>
     <style>
-    /* --- CSS STYLING --- */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body { background-color: #a4c5e3; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
-    
-    .navbar { background-color: #5f81b6; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; color: white; z-index: 10; }
-    .icon-btn { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
-    .logo { font-size: 22px; letter-spacing: 1px; font-weight: bold; }
+        /* --- DESIGN SYSTEM --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    .container { margin-top: 30px; width: 100%; max-width: 400px; padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
-    
-    .summary-row { display: flex; justify-content: space-between; gap: 15px; }
-    .summary-box { background-color: #6486b8; flex: 1; padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); position: relative; }
-    .summary-label { font-size: 12px; font-weight: 800; letter-spacing: 1px; display: block; margin-bottom: 8px; }
-    .text-green { color: #00ff7f; } 
-    .text-yellow { color: #ffcc00; }
-    .text-red { color: #ff3b30; }
-    .divider { border: 0; height: 1px; background: rgba(255, 255, 255, 0.3); margin-bottom: 8px; }
-    .summary-amount { color: white; font-size: 20px; font-weight: bold; }
+        body {
+            background-color: #0a0a0a;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
 
-    .mode-row { display: flex; justify-content: center; gap: 10px; margin-top: 5px; }
-    .mode-btn { background: #6486b8; border: none; color: rgba(255,255,255,0.6); font-size: 13px; font-weight: bold; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .mode-btn.active { background-color: #5f81b6; color: white; border: 1px solid rgba(255,255,255,0.3); }
-    .mode-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+        /* --- LIGHT MODE OVERRIDES --- */
+        body.light-mode {
+            background-color: #f4f4f9;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            color: #111111;
+        }
 
-    .timer-box { background-color: #7998c9; border-radius: 12px; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); min-height: 120px; }
-    .time-display { font-size: 55px; font-weight: bold; color: white; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
-    
-    .action-row { display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; }
-    .action-btn { background-color: #6486b8; border: none; flex: 1; padding: 15px 5px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.2s ease; color: white;}
-    .action-btn:hover { background-color: #4b6a96; }
+        body.light-mode .navbar { background-color: rgba(255, 255, 255, 0.8); border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+        body.light-mode .icon-btn { background: rgba(0, 0, 0, 0.05); border-color: rgba(0, 0, 0, 0.1); color: #111111; }
+        body.light-mode .logo { background: linear-gradient(to right, #111111, #ff4d4d); -webkit-background-clip: text; background-clip: text; }
+        body.light-mode .sidebar { background-color: #ffffff; }
+        body.light-mode .sidebar-header { border-bottom: 1px solid rgba(0, 0, 0, 0.08); color: #111111; }
+        body.light-mode .summary-box, body.light-mode .timer-display, body.light-mode .modal { background-color: #ffffff; border-color: rgba(0, 0, 0, 0.1); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); color: #111111; }
+        body.light-mode .value { color: #111111; }
+        body.light-mode .divider { background: rgba(0, 0, 0, 0.1); }
+        body.light-mode .mode-btn { background: #e0e0e0; color: #666; }
+        body.light-mode .action-btn { background: #ffffff; border-color: rgba(0,0,0,0.1); color: #111111; }
+        body.light-mode .clear-btn { background: #ffffff; color: #111111; border-color: rgba(0,0,0,0.1); }
 
-    #btn-save-settings { background-color: #00ff7f; color: #2c3e50; margin-top: 10px; padding: 12px; width: 100%; font-size: 13px; font-weight: 800; border-radius: 8px; border:none; cursor: pointer; }
-    
-    .footer-area { width: 100%; max-width: 400px; padding: 20px 20px 40px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-    
-    #toggle-settings { background-color: #5f81b6; padding: 10px 20px; font-size: 11px; border-radius: 20px; width: auto; color: white; border: none; cursor: pointer; font-weight: 800; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        /* NAVBAR */
+        .navbar {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            z-index: 10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
-    .settings-box { background-color: #6486b8; border-radius: 12px; padding: 15px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: none; width: 100%; }
-    .settings-title { color: white; font-size: 12px; font-weight: bold; text-align: center; margin-bottom: 15px; letter-spacing: 1px;}
-    .settings-group { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .settings-label { color: white; font-size: 12px; font-weight: bold; width: 50px; text-align: right; }
-    .custom-input { width: 100%; background-color: #7998c9; border: none; color: white; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: bold; text-align: center; }
+        .icon-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; transition: all 0.3s ease; }
+        .logo { font-size: 24px; letter-spacing: 4px; font-weight: 900; background: linear-gradient(to right, #ffffff, #ff4d4d); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
-    /* SIDEBAR */
-    .sidebar { position: fixed; top: 0; left: -250px; width: 250px; height: 100%; background-color: #5f81b6; transition: left 0.3s ease; z-index: 1000; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2); }
-    .sidebar.open { left: 0; }
-    .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
-    .sidebar-menu { list-style: none; margin-top: 10px; }
-    .sidebar-menu a { display: block; color: white; text-decoration: none; padding: 20px; font-size: 18px; font-weight: bold; transition: all 0.3s ease; }
-    .sidebar-menu a:hover { background-color: #7998c9; padding-left: 30px; color: #00ff7f; }
-    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none; z-index: 999; }
-    .sidebar-overlay.show { display: block; }
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background-color: #0f0f0f; border-right: 1px solid #ff4d4d; transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1); z-index: 1000; }
+        .sidebar.open { transform: translateX(280px); }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 25px; color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .sidebar-header h2 { font-size: 18px; letter-spacing: 2px; font-weight: 800; }
+        .sidebar-menu { list-style: none; margin-top: 10px; }
+        .sidebar-menu a { display: block; color: #888888; text-decoration: none; padding: 18px 25px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease; border-left: 3px solid transparent; }
+        .sidebar-menu a:hover { color: #ffffff; background: #151515; border-left-color: #ff4d4d; padding-left: 30px; }
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); display: none; z-index: 999; }
+        .sidebar-overlay.show { display: block; }
+
+        .container { margin-top: 30px; width: 100%; max-width: 420px; padding: 0 20px; display: flex; flex-direction: column; gap: 15px; }
+        .summary-row { display: flex; justify-content: space-between; gap: 15px; }
+        .summary-box { background: #111111; border: 1px solid rgba(255, 255, 255, 0.08); flex: 1; padding: 20px 10px; border-radius: 12px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+        .summary-label { font-size: 11px; font-weight: 800; letter-spacing: 3px; display: block; margin-bottom: 10px; }
+        .divider { border: 0; height: 1px; background: rgba(255, 255, 255, 0.1); margin-bottom: 10px; }
+        .value { color: white; font-size: 24px; font-weight: 900; }
+
+        .mode-row { display: flex; gap: 10px; }
+        .mode-btn { flex: 1; background: #151515; border: 1px solid rgba(255, 255, 255, 0.08); color: #888888; padding: 15px; border-radius: 8px; font-weight: 800; font-size: 12px; cursor: pointer; transition: all 0.2s ease; }
+        .mode-btn.active { background: #ff4d4d; color: white; border-color: #ff4d4d; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3); }
+
+        /* --- ALGORITHM DOWNWARD DIGIT ANIMATION --- */
+        .timer-display {
+            background: #111111;
+            border-top: 3px solid #ff4d4d;
+            border-radius: 12px;
+            padding: 45px 10px;
+            text-align: center;
+            font-size: 70px;
+            font-weight: 900;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            letter-spacing: -2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .digit-container {
+            display: inline-block;
+            height: 80px;
+            overflow: hidden;
+            position: relative;
+            width: 45px;
+        }
+
+        .digit {
+            display: block;
+            position: relative;
+        }
+
+        /* DOWNWARD Animation class */
+        .roll-down {
+            animation: digitRollDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes digitRollDown {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .separator { width: 20px; }
+
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .action-btn { background: #151515; border: 1px solid rgba(255, 255, 255, 0.08); padding: 18px 5px; border-radius: 8px; font-size: 11px; font-weight: 800; color: white; cursor: pointer; }
+        .action-btn:hover { background: #1a1a1a; transform: translateY(-2px); }
+        .btn-green:hover { border-color: #00ff7f; color: #00ff7f; }
+
+        .customize-row { margin-top: 5px; }
+        .clear-btn { background: #151515; border: 1px solid rgba(255,255,255,0.1); color: #ffffff; padding: 15px; border-radius: 8px; font-size: 11px; font-weight: 800; width: 100%; cursor: pointer; transition: all 0.3s ease; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1100; }
+        .modal { background: #111111; width: 90%; max-width: 350px; padding: 30px; border-radius: 12px; border-top: 3px solid #ff4d4d; text-align: center; }
+        .time-input-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .modal input { width: 100%; background: #0a0a0a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 12px; color: white; text-align: center; font-weight: 800; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-btn { flex: 1; padding: 15px; border-radius: 8px; font-weight: 800; cursor: pointer; border: none; text-transform: uppercase; }
+        .btn-confirm { background: #ff4d4d; color: white; }
+        .btn-cancel { background: transparent; color: #888888; border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
 <body>
 
     <nav id="sidebar" class="sidebar">
-        <div class="sidebar-header"><h2>MENU</h2><button id="close-sidebar-btn" class="icon-btn">✕</button></div>
+        <div class="sidebar-header">
+            <h2>MENU</h2>
+            <button id="close-sidebar-btn" class="icon-btn">✕</button> 
+        </div>
         <ul class="sidebar-menu">
             <li><a href="index.html">Home</a></li>
             <li><a href="budget-tracker.html">Budget Tracker</a></li>
+            <li><a href="calendar.html">Calendar</a></li>
             <li><a href="todo-list.html">To-Do List</a></li>
         </ul>
     </nav>
@@ -78,190 +169,256 @@
     <header class="navbar">
         <button id="menu-btn" class="icon-btn">☰</button>
         <h1 class="logo">FOCUS TIMER</h1>
-        <button class="icon-btn">👤</button>
+        <div style="width: 40px;"></div>
     </header>
 
     <main class="container">
         <div class="summary-row">
             <div class="summary-box">
-                <span class="summary-label text-green">SESSIONS DONE</span>
+                <span class="summary-label" style="color: #00ff7f">SESSIONS</span>
                 <hr class="divider">
-                <span class="summary-amount" id="session-count">0</span>
+                <span class="value" id="session-count">0</span>
             </div>
             <div class="summary-box">
-                <span class="summary-label text-yellow">CURRENT MODE</span>
+                <span class="summary-label" style="color: #facc15">MODE</span>
                 <hr class="divider">
-                <span class="summary-amount" id="current-mode-display">FOCUS</span>
+                <span class="value" id="mode-text">FOCUS</span>
             </div>
         </div>
 
         <div class="mode-row">
-            <button class="mode-btn active" id="btn-mode-focus">Focus</button>
-            <button class="mode-btn" id="btn-mode-break">Break</button>
+            <button class="mode-btn active" id="focus-mode">FOCUS</button>
+            <button class="mode-btn" id="break-mode">BREAK</button>
         </div>
 
-        <div class="timer-box">
-            <div class="time-display" id="time-display">25:00</div>
+        <div class="timer-display">
+            <div class="digit-container"><span id="h1" class="digit">0</span></div>
+            <div class="digit-container"><span id="h2" class="digit">0</span></div>
+            <div class="separator">:</div>
+            <div class="digit-container"><span id="m1" class="digit">0</span></div>
+            <div class="digit-container"><span id="m2" class="digit">0</span></div>
+            <div class="separator">:</div>
+            <div class="digit-container"><span id="s1" class="digit">0</span></div>
+            <div class="digit-container"><span id="s2" class="digit">0</span></div>
         </div>
 
-        <div class="action-row">
-            <button class="action-btn text-green" id="btn-start-pause">START</button>
-            <button class="action-btn text-red" id="btn-reset">RESET TIMER</button>
-            <button class="action-btn" style="color:#ffcc00;" id="reset-sessions-btn">RESET SESSIONS</button>
+        <div class="action-grid">
+            <button class="action-btn btn-green" id="start-btn">START</button>
+            <button class="action-btn" id="reset-btn">RESET</button>
+            <button class="action-btn" id="clear-btn">CLEAR</button>
+        </div>
+
+        <div class="customize-row">
+            <button class="clear-btn" id="customize-btn">⚙ CUSTOM FOCUS TIME</button>
         </div>
     </main>
 
-    <div class="footer-area">
-        <button id="toggle-settings">⚙️ CUSTOMIZE TIME</button>
-
-        <div class="settings-box" id="settings-area">
-            <div class="settings-title">CUSTOMIZE TIME</div>
-            <div class="settings-group">
-                <span class="settings-label">Focus:</span>
-                <input type="number" id="f-hr" class="custom-input" placeholder="Hr">
-                <input type="number" id="f-min" class="custom-input" placeholder="Min">
-                <input type="number" id="f-sec" class="custom-input" placeholder="Sec">
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <h3 id="modal-title" style="margin-bottom: 20px;">SET CUSTOM TIME</h3>
+            <div class="time-input-row">
+                <div class="input-group"><input type="number" id="custom-h" placeholder="H" min="0"></div>
+                <div class="input-group"><input type="number" id="custom-m" placeholder="M" min="0" max="59"></div>
+                <div class="input-group"><input type="number" id="custom-s" placeholder="S" min="0" max="59"></div>
             </div>
-            <div class="settings-group">
-                <span class="settings-label">Break:</span>
-                <input type="number" id="b-hr" class="custom-input" placeholder="Hr">
-                <input type="number" id="b-min" class="custom-input" placeholder="Min">
-                <input type="number" id="b-sec" class="custom-input" placeholder="Sec">
+            <div class="modal-buttons">
+                <button class="modal-btn btn-cancel" id="modal-cancel">CANCEL</button>
+                <button class="modal-btn btn-confirm" id="modal-confirm">CONFIRM</button>
             </div>
-            <button id="btn-save-settings">SAVE SETTINGS</button>
         </div>
     </div>
 
     <script>
-        // SIDEBAR
-        const menuBtn = document.getElementById('menu-btn'), closeSidebarBtn = document.getElementById('close-sidebar-btn'), sidebar = document.getElementById('sidebar'), overlay = document.getElementById('sidebar-overlay');
-        function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('show'); }
-        function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
-        menuBtn.onclick = openSidebar; closeSidebarBtn.onclick = closeSidebar; overlay.onclick = closeSidebar;
+        if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
 
-        // SETTINGS TOGGLE
-        const toggleBtn = document.getElementById('toggle-settings');
-        const settingsArea = document.getElementById('settings-area');
-        toggleBtn.onclick = () => {
-            const isHidden = settingsArea.style.display === 'none' || settingsArea.style.display === '';
-            settingsArea.style.display = isHidden ? 'block' : 'none';
-            toggleBtn.innerText = isHidden ? '✕ CLOSE SETTINGS' : '⚙️ CUSTOMIZE TIME';
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const toggleSidebar = (show) => {
+            sidebar.classList.toggle('open', show);
+            sidebarOverlay.classList.toggle('show', show);
         };
+        document.getElementById('menu-btn').onclick = () => toggleSidebar(true);
+        document.getElementById('close-sidebar-btn').onclick = () => toggleSidebar(false);
+        sidebarOverlay.onclick = () => toggleSidebar(false);
 
-        const alarmSound = new Audio('https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg');
+        let focusSettings = { h: 0, m: 0, s: 0 };
+        let breakSettings = { h: 0, m: 0, s: 0 }; 
+        let timeLeft = 0; 
+        let timerId = null;
+        let isRunning = false;
+        let sessions = 0;
+        let currentMode = 'FOCUS';
 
-        // TIMER LOGIC
-        let focusTimeSeconds = 25 * 60, breakTimeSeconds = 5 * 60, isRunning = false, isFocusMode = true, sessionsCompleted = 0, endTime = null, timeRemaining = 0, timerInterval = null;
-        const timeDisplay = document.getElementById('time-display'), btnStartPause = document.getElementById('btn-start-pause'), sessionCountDisplay = document.getElementById('session-count'), currentModeDisplay = document.getElementById('current-mode-display');
-        const fHr = document.getElementById('f-hr'), fMin = document.getElementById('f-min'), fSec = document.getElementById('f-sec'), bHr = document.getElementById('b-hr'), bMin = document.getElementById('b-min'), bSec = document.getElementById('b-sec');
+        const digitIds = ['h1', 'h2', 'm1', 'm2', 's1', 's2'];
+        const startBtn = document.getElementById('start-btn');
+        const focusModeBtn = document.getElementById('focus-mode');
+        const breakModeBtn = document.getElementById('break-mode');
+        const customizeBtn = document.getElementById('customize-btn');
 
-        function saveState() {
-            localStorage.setItem('focusTimerState', JSON.stringify({ focusTotalSecs: focusTimeSeconds, breakTotalSecs: breakTimeSeconds, isRunning, isFocusMode, endTime, timeRemaining, sessions: sessionsCompleted }));
+        let audioCtx = null;
+
+        function playAlarm(repeats = 5) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const beep = (count) => {
+                if (count <= 0) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = "sine";
+                osc.frequency.value = 880; 
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.8);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 1);
+                setTimeout(() => beep(count - 1), 1200);
+            };
+            beep(repeats);
         }
 
-        function loadState() {
-            const saved = localStorage.getItem('focusTimerState');
+        function updateUI() {
+            const h = Math.floor(timeLeft / 3600).toString().padStart(2, '0');
+            const m = Math.floor((timeLeft % 3600) / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+
+            const fullString = h + m + s;
+
+            for (let i = 0; i < 6; i++) {
+                const el = document.getElementById(digitIds[i]);
+                const newValue = fullString[i];
+
+                if (el.textContent !== newValue) {
+                    el.textContent = newValue;
+                    el.classList.remove('roll-down');
+                    void el.offsetWidth; 
+                    el.classList.add('roll-down');
+                }
+            }
+
+            document.getElementById('session-count').textContent = sessions;
+            document.getElementById('mode-text').textContent = currentMode;
+            focusModeBtn.classList.toggle('active', currentMode === 'FOCUS');
+            breakModeBtn.classList.toggle('active', currentMode === 'BREAK');
+            startBtn.textContent = isRunning ? "PAUSE" : "START";
+            customizeBtn.innerHTML = `⚙ CUSTOM ${currentMode} TIME`;
+
+            localStorage.setItem('timerState', JSON.stringify({
+                timeLeft, currentMode, isRunning, sessions, focusSettings, breakSettings
+            }));
+        }
+
+        function tick() {
+            const endTime = localStorage.getItem('timerEndTime');
+            if (endTime) {
+                timeLeft = Math.max(0, Math.round((endTime - Date.now()) / 1000));
+            } else if (isRunning) {
+                timeLeft--;
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerId);
+                localStorage.removeItem('timerEndTime');
+                isRunning = false;
+                playAlarm(5);
+                if (currentMode === 'FOCUS') {
+                    sessions++;
+                    setTimeout(() => switchMode('BREAK'), 100); 
+                } else {
+                    setTimeout(() => switchMode('FOCUS'), 100);
+                }
+            }
+            updateUI();
+        }
+
+        function startTimer() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (timeLeft <= 0) return; 
+            if (isRunning) {
+                clearInterval(timerId);
+                localStorage.removeItem('timerEndTime');
+                isRunning = false;
+            } else {
+                isRunning = true;
+                const endTime = Date.now() + (timeLeft * 1000);
+                localStorage.setItem('timerEndTime', endTime);
+                timerId = setInterval(tick, 1000);
+            }
+            updateUI();
+        }
+
+        function switchMode(mode) {
+            if (isRunning && currentMode !== mode) {
+                if (!confirm(`Switching to ${mode} mode will interrupt your session. Continue?`)) return;
+            }
+            clearInterval(timerId);
+            isRunning = false;
+            localStorage.removeItem('timerEndTime');
+            currentMode = mode;
+            const settings = (mode === 'FOCUS') ? focusSettings : breakSettings;
+            timeLeft = (settings.h * 3600) + (settings.m * 60) + settings.s;
+            updateUI();
+        }
+
+        window.onload = () => {
+            const saved = JSON.parse(localStorage.getItem('timerState'));
             if (saved) {
-                const s = JSON.parse(saved);
-                focusTimeSeconds = s.focusTotalSecs; breakTimeSeconds = s.breakTotalSecs; sessionsCompleted = s.sessions || 0;
-                sessionCountDisplay.innerText = sessionsCompleted; isFocusMode = s.isFocusMode; isRunning = s.isRunning;
-                endTime = s.endTime; timeRemaining = s.timeRemaining;
-                if (isRunning && endTime) {
-                    const diff = Math.round((endTime - Date.now()) / 1000);
-                    if (diff > 0) { timeRemaining = diff; startInterval(); updateUI(true); } 
-                    else { handleTimerFinish(true); }
-                } else { updateDisplay(timeRemaining || (isFocusMode ? focusTimeSeconds : breakTimeSeconds)); updateUI(false); }
-            } else { timeRemaining = focusTimeSeconds; updateDisplay(timeRemaining); }
-            updateModeUI();
-        }
-
-        function updateUI(running) {
-            btnStartPause.innerText = running ? "PAUSE" : "START";
-            btnStartPause.className = running ? "action-btn text-yellow" : "action-btn text-green";
-            document.getElementById('btn-mode-focus').disabled = running;
-            document.getElementById('btn-mode-break').disabled = running;
-        }
-
-        function updateModeUI() {
-            document.getElementById('btn-mode-focus').classList.toggle('active', isFocusMode);
-            document.getElementById('btn-mode-break').classList.toggle('active', !isFocusMode);
-            currentModeDisplay.innerText = isFocusMode ? "FOCUS" : "BREAK";
-            currentModeDisplay.className = isFocusMode ? "summary-amount text-yellow" : "summary-amount text-green";
-        }
-
-        function updateDisplay(s) {
-            const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
-            timeDisplay.innerText = h > 0 ? `${h}:${m<10?'0':''}${m}:${sec<10?'0':''}${sec}` : `${m<10?'0':''}${m}:${sec<10?'0':''}${sec}`;
-        }
-
-        function startInterval() {
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeRemaining = Math.round((endTime - Date.now()) / 1000);
-                if (timeRemaining <= 0) { timeRemaining = 0; updateDisplay(0); handleTimerFinish(false); }
-                else { updateDisplay(timeRemaining); }
-                saveState();
-            }, 1000);
-        }
-
-        btnStartPause.onclick = () => {
-            alarmSound.play().then(() => { alarmSound.pause(); alarmSound.currentTime = 0; }).catch(() => {});
-            if (isRunning) { clearInterval(timerInterval); isRunning = false; endTime = null; updateUI(false); } 
-            else { isRunning = true; endTime = Date.now() + (timeRemaining * 1000); startInterval(); updateUI(true); }
-            saveState();
-        };
-
-        function handleTimerFinish(bg) {
-            clearInterval(timerInterval); isRunning = false; endTime = null; updateUI(false);
-            alarmSound.play();
-            setTimeout(() => {
-                alert(isFocusMode ? "Focus Complete!" : "Break Over!");
-                alarmSound.pause(); alarmSound.currentTime = 0;
-                if (isFocusMode) { sessionsCompleted++; sessionCountDisplay.innerText = sessionsCompleted; isFocusMode = false; timeRemaining = breakTimeSeconds; }
-                else { isFocusMode = true; timeRemaining = focusTimeSeconds; }
-                updateModeUI(); updateDisplay(timeRemaining); saveState();
-            }, 100);
-        }
-
-        document.getElementById('btn-reset').onclick = () => {
-            clearInterval(timerInterval); isRunning = false; endTime = null;
-            timeRemaining = isFocusMode ? focusTimeSeconds : breakTimeSeconds;
-            updateDisplay(timeRemaining); updateUI(false); saveState();
-        };
-
-        document.getElementById('reset-sessions-btn').onclick = () => {
-            if(confirm("Reset completed sessions?")) {
-                sessionsCompleted = 0; sessionCountDisplay.innerText = "0"; saveState();
+                timeLeft = saved.timeLeft;
+                currentMode = saved.currentMode;
+                sessions = saved.sessions;
+                focusSettings = saved.focusSettings;
+                breakSettings = saved.breakSettings;
+                isRunning = saved.isRunning;
             }
-        };
-
-        document.getElementById('btn-save-settings').onclick = () => {
-            const fh=parseInt(fHr.value)||0, fm=parseInt(fMin.value)||0, fs=parseInt(fSec.value)||0;
-            const bh=parseInt(bHr.value)||0, bm=parseInt(bMin.value)||0, bs=parseInt(bSec.value)||0;
-            const newF = (fh*3600)+(fm*60)+fs, newB = (bh*3600)+(bm*60)+bs;
-            if(newF > 0 && newB > 0) { 
-                focusTimeSeconds = newF; breakTimeSeconds = newB;
-                timeRemaining = isFocusMode ? focusTimeSeconds : breakTimeSeconds; 
-                updateDisplay(timeRemaining); saveState();
-                const saveBtn = document.getElementById('btn-save-settings');
-                saveBtn.innerText = "SAVED!";
-                setTimeout(() => { saveBtn.innerText = "SAVE SETTINGS"; }, 2000);
+            const endTime = localStorage.getItem('timerEndTime');
+            if (endTime && isRunning) {
+                const remaining = Math.round((endTime - Date.now()) / 1000);
+                if (remaining > 0) {
+                    timeLeft = remaining;
+                    timerId = setInterval(tick, 1000);
+                } else {
+                    isRunning = false;
+                    localStorage.removeItem('timerEndTime');
+                }
             }
+            updateUI();
         };
 
-        document.getElementById('btn-mode-focus').onclick = () => { if(!isRunning) { isFocusMode=true; timeRemaining=focusTimeSeconds; updateModeUI(); updateDisplay(timeRemaining); saveState(); }};
-        document.getElementById('btn-mode-break').onclick = () => { if(!isRunning) { isFocusMode=false; timeRemaining=breakTimeSeconds; updateModeUI(); updateDisplay(timeRemaining); saveState(); }};
+        focusModeBtn.onclick = () => switchMode('FOCUS');
+        breakModeBtn.onclick = () => switchMode('BREAK');
+        startBtn.onclick = startTimer;
+        document.getElementById('reset-btn').onclick = () => {
+            if (isRunning && !confirm("Reset current timer?")) return;
+            switchMode(currentMode);
+        };
+        document.getElementById('clear-btn').onclick = () => { sessions = 0; updateUI(); };
 
-        // SERVICE WORKER REGISTRATION (Essential for Offline)
+        const modal = document.getElementById('modal-overlay');
+        customizeBtn.onclick = () => {
+            document.getElementById('custom-h').value = "";
+            document.getElementById('custom-m').value = "";
+            document.getElementById('custom-s').value = "";
+            document.getElementById('modal-title').innerText = `SET CUSTOM ${currentMode} TIME`;
+            modal.style.display = 'flex';
+        };
+        document.getElementById('modal-cancel').onclick = () => modal.style.display = 'none';
+        document.getElementById('modal-confirm').onclick = () => {
+            const h = parseInt(document.getElementById('custom-h').value) || 0;
+            const m = parseInt(document.getElementById('custom-m').value) || 0;
+            const s = parseInt(document.getElementById('custom-s').value) || 0;
+            if (currentMode === 'FOCUS') focusSettings = {h,m,s}; else breakSettings = {h,m,s};
+            switchMode(currentMode);
+            modal.style.display = 'none';
+        };
+
+    // SERVICE WORKER REGISTRATION
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Focus Timer SW Registered!', reg))
-                    .catch(err => console.log('Focus Timer SW registration failed:', err));
+                    .then(reg => console.log('SW Registered!', reg))
+                    .catch(err => console.error('SW Registration Failed:', err));
             });
         }
-
-        loadState();
     </script>
 </body>
 </html>

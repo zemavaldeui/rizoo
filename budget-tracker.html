@@ -5,58 +5,525 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RIZO</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#5f81b6">
+    <meta name="theme-color" content="#0a0a0a">
     <link rel="icon" href="icon/icon192/192.png" />
-    
+
     <style>
-        /* --- CSS STYLING --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-        body { background-color: #a4c5e3; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            z-index: 10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover { 
+            background: #ff4d4d; 
+            border-color: #ff4d4d; 
+        }
+
+        .logo {
+            font-size: 24px;
+            letter-spacing: 4px;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #ffffff, #ff4d4d);
+            -webkit-background-clip: text; 
+            background-clip: text;         
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* MAIN LAYOUT */
+        .container {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 420px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        /* SUMMARY BOXES */
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .summary-box {
+            background: #111111;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            flex: 1;
+            padding: 20px 10px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            display: block;
+            margin-bottom: 10px;
+            color: #888888;
+        }
+
+        .summary-amount {
+            color: white;
+            font-size: 24px;
+            font-weight: 900;
+            transition: color 0.3s ease;
+        }
+
+        .text-green { color: #00ff7f; transition: color 0.3s ease; }
+        .text-red { color: #ff4d4d; transition: color 0.3s ease; }
+
+        .divider {
+            border: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* BREAKDOWN LIST */
+        .breakdown-box {
+            background: #111111;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .breakdown-title {
+            color: white;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        .breakdown-list {
+            list-style: none;
+            color: #cccccc;
+            font-size: 14px;
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-top: 10px;
+            padding-right: 5px;
+            max-height: 250px; /* <--- NEW: Added max-height to force the scrollbar to appear */
+        }
+
+        .breakdown-list::-webkit-scrollbar { width: 4px; }
+        .breakdown-list::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: border-color 0.3s ease, color 0.3s ease;
+        }
         
-        .navbar { background-color: #5f81b6; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; color: white; z-index: 10; }
-        .icon-btn { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
-        .logo { font-size: 22px; letter-spacing: 1px; font-weight: bold; }
+        .breakdown-item:last-child { border-bottom: none; }
 
-        .container { margin-top: 30px; width: 100%; max-width: 400px; padding: 0 20px; display: flex; flex-direction: column; gap: 20px; }
-        
-        .summary-row { display: flex; justify-content: space-between; gap: 15px; }
-        .summary-box { background-color: #6486b8; flex: 1; padding: 15px 10px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-        .summary-label { font-size: 12px; font-weight: 800; letter-spacing: 1px; display: block; margin-bottom: 8px; }
-        .text-green { color: #00ff7f; } 
-        .text-red { color: #ff3b30; }   
-        .divider { border: 0; height: 1px; background: rgba(255, 255, 255, 0.3); margin-bottom: 8px; }
-        .summary-amount { color: white; font-size: 20px; font-weight: bold; }
+        .clear-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #888888;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 15px;
+            display: block;
+            width: 100%;
+            transition: all 0.2s;
+        }
 
-        .breakdown-box { background-color: #7998c9; border-radius: 12px; padding: 15px; min-height: 350px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; }
-        .breakdown-title { color: white; text-align: center; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-        .breakdown-list { list-style: none; color: white; font-size: 14px; flex-grow: 1; overflow-y: auto; }
-        .breakdown-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .clear-btn:hover {
+            background: rgba(255, 77, 77, 0.1);
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+        }
 
-        .action-row { display: flex; justify-content: space-between; gap: 15px; margin-top: auto; padding-bottom: 20px; }
-        .action-btn { background-color: #6486b8; border: none; flex: 1; padding: 18px 5px; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.2s ease; color: white;}
-        .action-btn:hover { background-color: #4b6a96; }
+        /* ACTION BUTTONS */
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 5px; 
+            padding-bottom: 20px; 
+        }
+
+        .action-btn {
+            background: #151515;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            flex: 1;
+            padding: 18px 5px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover { background: #1a1a1a; transform: translateY(-2px); }
+        .action-btn.text-green { color: #00ff7f; }
+        .action-btn.text-green:hover { border-color: #00ff7f; box-shadow: 0 4px 15px rgba(0, 255, 127, 0.1); }
+        .action-btn.text-red { color: #ff4d4d; }
+        .action-btn.text-red:hover { border-color: #ff4d4d; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.1); }
 
         /* SIDEBAR */
-        .sidebar { position: fixed; top: 0; left: -250px; width: 250px; height: 100%; background-color: #5f81b6; transition: left 0.3s ease; z-index: 1000; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2); }
-        .sidebar.open { left: 0; }
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background-color: #0f0f0f;
+            border-right: 1px solid #ff4d4d;
+            transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1), background-color 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.open { transform: translateX(280px); }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: border-color 0.3s ease, color 0.3s ease;
+        }
+
+        .sidebar-header h2 { font-size: 18px; letter-spacing: 2px; font-weight: 800; }
+
         .sidebar-menu { list-style: none; margin-top: 10px; }
-        .sidebar-menu a { display: block; color: white; text-decoration: none; padding: 20px; font-size: 18px; font-weight: bold; transition: all 0.3s ease; }
-        .sidebar-menu a:hover { background-color: #7998c9; padding-left: 30px; color: #00ff7f; }
-        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); display: none; z-index: 999; }
+
+        .sidebar-menu a {
+            display: block;
+            color: #888888;
+            text-decoration: none;
+            padding: 18px 25px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            color: #ffffff;
+            background: #151515;
+            border-left-color: #ff4d4d;
+            padding-left: 30px;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            z-index: 999;
+        }
+
         .sidebar-overlay.show { display: block; }
 
         /* MODAL */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1100; }
-        .modal { background-color: #f0f4f8; width: 90%; max-width: 350px; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
-        .modal-error { color: #ff3b30; font-size: 14px; font-weight: bold; margin-bottom: 15px; display: none; }
-        .modal input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
-        .modal-buttons { display: flex; gap: 10px; }
-        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-confirm { background-color: #5f81b6; color: white; }
-        .btn-cancel { background-color: #ccc; color: #333; }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1100;
+        }
+
+        .modal {
+            background-color: #111111;
+            width: 90%;
+            max-width: 350px;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #ff4d4d;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            text-align: center;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        #modal-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .modal-error {
+            color: #ff4d4d;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: none;
+            background: rgba(255, 77, 77, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .modal input {
+            width: 100%;
+            background: #0a0a0a;
+            color: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+        }
+
+        .modal input:focus { outline: none; border-color: #ff4d4d; }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-confirm { background-color: #ff4d4d; color: white; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.2); }
+        .btn-confirm:hover { background-color: #ff6666; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 77, 77, 0.4); }
         
-        .clear-btn { background-color: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; padding: 8px; border-radius: 5px; font-size: 11px; cursor: pointer; margin-top: 10px; display: block; width: 100%; }
+        .btn-cancel { background-color: transparent; color: #888888; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-cancel:hover { background-color: rgba(255, 255, 255, 0.05); color: white; }
+
+        /* --- NEW: Active Sort Style --- */
+        .active-sort {
+            border-color: #00ff7f !important;
+            color: #00ff7f !important;
+            background: rgba(0, 255, 127, 0.1) !important;
+        }
+
+        /* ========================================= */
+        /* --- LIGHT MODE OVERRIDES (Budget Tracker)--- */
+        /* ========================================= */
+        body.light-mode {
+            background-color: #f4f4f9;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            color: #111111;
+        }
+        
+        body.light-mode .navbar {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            color: #111111;
+        }
+
+        body.light-mode .icon-btn {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #111111;
+        }
+
+        body.light-mode .logo {
+            background: linear-gradient(to right, #111111, #ff4d4d);
+            -webkit-background-clip: text; 
+            background-clip: text;         
+            -webkit-text-fill-color: transparent;
+        }
+
+        body.light-mode .sidebar {
+            background-color: #ffffff;
+        }
+
+        body.light-mode .sidebar-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            color: #111111;
+        }
+
+        body.light-mode .sidebar-menu a {
+            color: #666666;
+        }
+
+        body.light-mode .sidebar-menu a:hover {
+            background-color: #f4f4f9;
+            color: #111111;
+        }
+
+        /* Budget Specific Overrides */
+        body.light-mode .summary-box,
+        body.light-mode .breakdown-box,
+        body.light-mode .modal {
+            background-color: #ffffff;
+            border-color: rgba(0, 0, 0, 0.08);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        body.light-mode .summary-amount,
+        body.light-mode .breakdown-title,
+        body.light-mode #modal-title {
+            color: #111111;
+        }
+
+        /* Tweaking red and green for better white background contrast */
+        body.light-mode .text-green { color: #00b359; }
+        body.light-mode .text-red { color: #e60000; }
+
+        /* Overriding the inline styles set by JavaScript for the breakdown items */
+        body.light-mode .breakdown-item span[style*="#00ff7f"] { color: #00b359 !important; }
+        body.light-mode .breakdown-item span[style*="#ff3b30"] { color: #e60000 !important; }
+
+        body.light-mode .breakdown-item {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            color: #333333;
+        }
+
+        body.light-mode .divider {
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        body.light-mode .action-btn {
+            background-color: #ffffff;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-mode .action-btn:hover {
+            background-color: #fafafa;
+        }
+
+        body.light-mode .clear-btn {
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #666666;
+        }
+
+        body.light-mode .clear-btn:hover {
+            background: rgba(255, 77, 77, 0.05);
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+        }
+
+        /* Modal Overrides */
+        body.light-mode .modal input {
+            background-color: #fafafa;
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #111111;
+        }
+
+        body.light-mode .modal input:focus {
+            background-color: #ffffff;
+            border-color: #ff4d4d;
+        }
+
+        body.light-mode .btn-cancel {
+            color: #666666;
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        body.light-mode .btn-cancel:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: #111111;
+        }
+
+        /* Light Mode specific Active Sort Style */
+        body.light-mode .active-sort {
+            border-color: #00b359 !important;
+            color: #00b359 !important;
+            background: rgba(0, 179, 89, 0.1) !important;
+        }
+
     </style>
 </head>
 <body>
@@ -68,8 +535,9 @@
         </div>
         <ul class="sidebar-menu">
             <li><a href="index.html">Home</a></li>
-            <li><a href="todo-list.html">To-Do List</a></li>
+            <li><a href="calendar.html">Calendar</a></li>
             <li><a href="focus-timer.html">Focus Timer</a></li>
+            <li><a href="todo-list.html">To-Do List</a></li>
         </ul>
     </nav>
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
@@ -77,32 +545,34 @@
     <header class="navbar">
         <button id="menu-btn" class="icon-btn">☰</button>
         <h1 class="logo">BUDGET TRACKER</h1>
-        <button class="icon-btn" id="profile-btn">👤</button>
-    </header>
+        <div style="width: 40px;"></div> </header>
 
     <main class="container">
         <div class="summary-row">
             <div class="summary-box">
-                <span class="summary-label text-green">ALLOWANCE</span>
+                <span class="summary-label text-green">BUDGET</span>
                 <hr class="divider">
                 <span class="summary-amount" id="allowance-display">₱ 0.00</span>
             </div>
             <div class="summary-box">
-                <span class="summary-label text-red">TOTAL EXPENSE</span>
+                <span class="summary-label text-red">EXPENSE</span>
                 <hr class="divider">
                 <span class="summary-amount" id="expense-display">₱ 0.00</span>
             </div>
         </div>
 
         <div class="breakdown-box">
-            <div class="breakdown-title">BREAKDOWN</div>
+            <div style="position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                <div class="breakdown-title" style="margin-bottom: 0;">BREAKDOWN</div>
+                <button id="btn-open-search" style="position: absolute; right: 0; background: transparent; border: none; font-size: 16px; cursor: pointer; color: #888888; outline: none; transition: color 0.2s;">🔍</button>
+            </div>
             <hr class="divider">
             <ul class="breakdown-list" id="breakdown-list"></ul>
             <button class="clear-btn" id="btn-clear-data">Clear All Data</button>
         </div>
 
         <div class="action-row">
-            <button class="action-btn text-green" id="btn-show-allowance">ADD ALLOWANCE</button>
+            <button class="action-btn text-green" id="btn-show-allowance">ADD BUDGET</button>
             <button class="action-btn text-red" id="btn-show-expense">ADD EXPENSE</button>
         </div>
     </main>
@@ -120,15 +590,50 @@
         </div>
     </div>
 
+    <div id="search-modal-overlay" class="modal-overlay">
+        <div class="modal" style="text-align: left; max-width: 380px;">
+            <h3 id="search-modal-title" style="text-align: center; color: inherit; font-size: 16px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">Find & Sort</h3>
+            
+            <input type="text" id="input-search" placeholder="Type a name, year, time, or date...">
+            
+            <div style="margin-top: 20px; margin-bottom: 10px; font-size: 11px; color: #888888; font-weight: 800; letter-spacing: 1px;">SORT BY</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button class="modal-btn btn-cancel sort-btn active-sort" id="sort-date-new">Newest</button>
+                <button class="modal-btn btn-cancel sort-btn" id="sort-date-old">Oldest</button>
+                <button class="modal-btn btn-cancel sort-btn" id="sort-amt-high">Highest ₱</button>
+                <button class="modal-btn btn-cancel sort-btn" id="sort-amt-low">Lowest ₱</button>
+                <button class="modal-btn btn-cancel sort-btn" id="sort-az">A - Z</button>
+                <button class="modal-btn btn-cancel sort-btn" id="sort-za">Z - A</button>
+            </div>
+
+            <div class="modal-buttons" style="margin-top: 25px;">
+                <button class="modal-btn btn-confirm" id="btn-search-close" style="background-color: #00ff7f; color: #000;">Done</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // --- SIDEBAR ---
+        /* --- Check Local Storage for Theme Setup on Page Load --- */
+        const currentTheme = localStorage.getItem('theme');
+        if (currentTheme === 'light') {
+            document.body.classList.add('light-mode');
+        }
+
+        // --- SIDEBAR LOGIC ---
         const menuBtn = document.getElementById('menu-btn');
         const closeSidebarBtn = document.getElementById('close-sidebar-btn');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
 
-        function openSidebar() { sidebar.classList.add('open'); sidebarOverlay.classList.add('show'); }
-        function closeSidebar() { sidebar.classList.remove('open'); sidebarOverlay.classList.remove('show'); }
+        function openSidebar() { 
+            sidebar.classList.add('open'); 
+            sidebarOverlay.classList.add('show'); 
+        }
+        
+        function closeSidebar() { 
+            sidebar.classList.remove('open'); 
+            sidebarOverlay.classList.remove('show'); 
+        }
 
         menuBtn.addEventListener('click', openSidebar);
         closeSidebarBtn.addEventListener('click', closeSidebar);
@@ -139,6 +644,7 @@
         let totalExpense = 0;
         let transactions = []; 
         let currentMode = ''; 
+        let currentSort = 'date-new'; // default sort
 
         const modalOverlay = document.getElementById('modal-overlay');
         const inputName = document.getElementById('input-name');
@@ -149,6 +655,13 @@
         const allowanceDisplay = document.getElementById('allowance-display');
         const expenseDisplay = document.getElementById('expense-display');
 
+        // NEW: Search & Sort Elements
+        const searchModalOverlay = document.getElementById('search-modal-overlay');
+        const btnOpenSearch = document.getElementById('btn-open-search');
+        const btnSearchClose = document.getElementById('btn-search-close');
+        const inputSearch = document.getElementById('input-search');
+        const sortBtns = document.querySelectorAll('.sort-btn');
+
         function loadData() {
             const savedData = localStorage.getItem('budgetData');
             if (savedData) {
@@ -157,12 +670,16 @@
                 totalExpense = parsedData.expense || 0;
                 transactions = parsedData.transactions || [];
                 updateUI();
-                transactions.forEach(item => renderListItem(item.name, item.amount, item.color));
+                refreshList(); // Uses our new filter/sort logic instead of standard loop
             }
         }
 
         function saveData() {
-            const dataToSave = { allowance: totalAllowance, expense: totalExpense, transactions: transactions };
+            const dataToSave = { 
+                allowance: totalAllowance, 
+                expense: totalExpense, 
+                transactions: transactions 
+            };
             localStorage.setItem('budgetData', JSON.stringify(dataToSave));
         }
 
@@ -171,64 +688,165 @@
             expenseDisplay.innerText = `₱ ${totalExpense.toFixed(2)}`;
         }
 
-        function renderListItem(name, amount, color) {
+        // Modified slightly to just build the element without hardcoding prepend/append
+        function renderListItem(name, amount, color, dateString) {
             const li = document.createElement('li');
             li.className = 'breakdown-item';
-            li.innerHTML = `<span>${name}</span><span style="color:${color === 'green' ? '#00ff7f' : '#ff3b30'}; font-weight:bold;">₱ ${amount.toFixed(2)}</span>`;
+            const colorHex = color === 'green' ? '#00ff7f' : '#ff3b30';
+            const dateHtml = dateString ? `<span style="font-size: 10px; color: #888888; font-weight: 500;">${dateString}</span>` : '';
+            
+            li.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span>${name}</span>
+                    ${dateHtml}
+                </div>
+                <span style="color:${colorHex}; font-weight:bold;">₱ ${amount.toFixed(2)}</span>
+            `;
             breakdownList.prepend(li); 
         }
 
+        // --- NEW: Refresh List Function (Handles Search Filtering & Sorting) ---
+        function refreshList() {
+            breakdownList.innerHTML = '';
+            
+            // 1. Filter based on search input
+            let filtered = transactions.filter(t => {
+                const term = inputSearch.value.toLowerCase();
+                const n = t.name ? t.name.toLowerCase() : '';
+                const d = t.date ? t.date.toLowerCase() : '';
+                return n.includes(term) || d.includes(term);
+            });
+
+            // 2. Sort the filtered array
+            // Note: Since renderListItem uses `prepend`, the last item processed ends up at the TOP of the list visually.
+            if (currentSort === 'date-new') {
+                // Default: loop normally, last transaction processed goes to the top (newest first).
+                filtered.forEach(item => renderListItem(item.name, item.amount, item.color, item.date));
+            } else if (currentSort === 'date-old') {
+                // Reverse array: newest processes first, oldest processes last (oldest ends up on top).
+                filtered.slice().reverse().forEach(item => renderListItem(item.name, item.amount, item.color, item.date));
+            } else if (currentSort === 'amt-high') {
+                // Sort lowest to highest amount (highest ends up on top).
+                filtered.sort((a, b) => a.amount - b.amount).forEach(item => renderListItem(item.name, item.amount, item.color, item.date));
+            } else if (currentSort === 'amt-low') {
+                // Sort highest to lowest amount (lowest ends up on top).
+                filtered.sort((a, b) => b.amount - a.amount).forEach(item => renderListItem(item.name, item.amount, item.color, item.date));
+            } else if (currentSort === 'az') {
+                // Sort Z to A (A ends up on top).
+                filtered.sort((a, b) => b.name.localeCompare(a.name)).forEach(item => renderListItem(item.name, item.amount, item.color, item.date));
+            } else if (currentSort === 'za') {
+                // Sort A to Z (Z ends up on top).
+                filtered.sort((a, b) => a.name.localeCompare(b.name)).forEach(item => renderListItem(item.name, item.amount, item.color, item.date));
+            }
+        }
+
+        // --- MODAL TRIGGERS ---
         document.getElementById('btn-show-allowance').onclick = () => {
-            currentMode = 'allowance'; modalTitle.innerText = "Add Allowance"; inputName.style.display = 'none';
-            inputAmount.value = ''; modalError.style.display = 'none'; modalOverlay.style.display = 'flex';
+            currentMode = 'allowance'; 
+            modalTitle.innerText = "Add Allowance"; 
+            inputName.style.display = 'none';
+            inputAmount.value = ''; 
+            modalError.style.display = 'none'; 
+            modalOverlay.style.display = 'flex';
         };
 
         document.getElementById('btn-show-expense').onclick = () => {
-            currentMode = 'expense'; modalTitle.innerText = "Add Expense"; inputName.style.display = 'block';
-            inputName.value = ''; inputAmount.value = ''; modalError.style.display = 'none'; modalOverlay.style.display = 'flex';
+            currentMode = 'expense'; 
+            modalTitle.innerText = "Add Expense"; 
+            inputName.style.display = 'block';
+            inputName.value = ''; 
+            inputAmount.value = ''; 
+            modalError.style.display = 'none'; 
+            modalOverlay.style.display = 'flex';
         };
 
-        document.getElementById('btn-modal-cancel').onclick = () => modalOverlay.style.display = 'none';
+        document.getElementById('btn-modal-cancel').onclick = () => {
+            modalOverlay.style.display = 'none';
+        }
 
         document.getElementById('btn-modal-confirm').onclick = () => {
             modalError.style.display = 'none';
             const amount = parseFloat(inputAmount.value);
+            
             if (isNaN(amount) || amount <= 0) return;
+
+            const dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
+            const currentDate = new Date().toLocaleString('en-US', dateOptions);
 
             if (currentMode === 'allowance') {
                 totalAllowance += amount;
-                const entry = { name: "Allowance Added", amount: amount, color: "green" };
+                const entry = { name: "Allowance Added", amount: amount, color: "green", date: currentDate };
                 transactions.push(entry);
-                renderListItem(entry.name, amount, entry.color);
             } else {
                 const name = inputName.value.trim() || "Expense";
-                if (amount > totalAllowance) { modalError.style.display = 'block'; return; }
+                if (amount > totalAllowance) { 
+                    modalError.style.display = 'block'; 
+                    return; 
+                }
                 totalExpense += amount; 
                 totalAllowance -= amount;
-                const entry = { name: name, amount: amount, color: "red" };
+                const entry = { name: name, amount: amount, color: "red", date: currentDate };
                 transactions.push(entry);
-                renderListItem(entry.name, amount, entry.color);
             }
+            
             updateUI();
             saveData(); 
+            refreshList(); // Now we update the view using our new sorting/filtering hub
             modalOverlay.style.display = 'none';
         };
 
+        // --- NEW: Search & Sort Event Listeners ---
+        btnOpenSearch.onclick = () => {
+            searchModalOverlay.style.display = 'flex';
+        };
+        
+        btnSearchClose.onclick = () => {
+            searchModalOverlay.style.display = 'none';
+        };
+
+        // Live updating as the user types
+        inputSearch.addEventListener('input', () => {
+            refreshList();
+        });
+
+        // Clicking the different sort options
+        sortBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Remove active class from all
+                sortBtns.forEach(b => b.classList.remove('active-sort'));
+                // Add active class to clicked button
+                e.target.classList.add('active-sort');
+                // Extract sort type from ID (e.g., 'sort-amt-high' becomes 'amt-high')
+                currentSort = e.target.id.replace('sort-', '');
+                // Immediately apply to list
+                refreshList();
+            });
+        });
+
+        // Hover effect for the new search icon
+        btnOpenSearch.addEventListener('mouseenter', () => btnOpenSearch.style.color = '#00ff7f');
+        btnOpenSearch.addEventListener('mouseleave', () => btnOpenSearch.style.color = '#888888');
+
+        // --- CLEAR DATA ---
         document.getElementById('btn-clear-data').onclick = () => {
             if (confirm("Clear all data?")) {
                 localStorage.removeItem('budgetData');
-                totalAllowance = 0; totalExpense = 0; transactions = [];
+                totalAllowance = 0; 
+                totalExpense = 0; 
+                transactions = [];
+                inputSearch.value = ''; // Reset search field too
                 updateUI();
-                breakdownList.innerHTML = '';
+                refreshList();
             }
         };
 
-        // --- SERVICE WORKER REGISTRATION ---
+        // --- SERVICE WORKER ---
+        // SERVICE WORKER REGISTRATION
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Budget SW Registered!', reg))
-                    .catch(err => console.error('Budget SW Failed:', err));
+                    .then(reg => console.log('SW Registered!', reg))
+                    .catch(err => console.error('SW Registration Failed:', err));
             });
         }
 
