@@ -244,6 +244,8 @@
             color: #cccccc;
             position: relative;
             transition: all 0.2s ease;
+            overflow: hidden; 
+            min-width: 0; 
         }
 
         .day:hover {
@@ -281,6 +283,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            width: 100%; 
             max-width: 90%;
             margin-top: 4px;
             text-transform: uppercase;
@@ -516,7 +519,10 @@
 
         body.light-mode .day { background: #fafafa; border-color: rgba(0, 0, 0, 0.05); color: #333333; }
         body.light-mode .day:hover { background: #f0f0f0; border-color: rgba(0,0,0,0.1); color: #111; }
-        body.light-mode .day.has-event { color: #ffffff; }
+        body.light-mode .day.has-event { color: #0a0a0a; }
+        body.light-mode .day.event-exam, body.light-mode .day.event-exam:hover { background-color: var(--color-exam); }
+        body.light-mode .day.event-health, body.light-mode .day.event-health:hover { background-color: var(--color-health); }
+        body.light-mode .day.event-personal, body.light-mode .day.event-personal:hover { background-color: var(--color-personal); }
         body.light-mode .day.today { border-color: #ff4d4d; color: #ff4d4d; }
 
         body.light-mode .modal-content input[type="text"], 
@@ -591,9 +597,9 @@
             <h3>Add / Edit Schedule</h3>
             <input type="text" id="eventTitle" placeholder="Event Name">
             <select id="eventType">
-                <option value="personal">Personal / Other</option>
-                <option value="exam">School</option>
                 <option value="health">Health</option>
+                <option value="exam">School</option>
+                <option value="personal">Personal / Other</option>
             </select>
             <div class="modal-actions">
                 <button id="deleteEventBtn">Delete</button>
@@ -662,9 +668,9 @@
 
         // --- NEW: DYNAMIC LABELS LOGIC ---
         const defaultLabels = {
-            personal: { name: "Personal / Other", color: "#ffcc00" }, // Yellow
+            health: { name: "Health", color: "#ff4d4d" },              // Red
             exam: { name: "School", color: "#00ff7f" },             // Green
-            health: { name: "Health", color: "#ff4d4d" }              // Red
+            personal: { name: "Personal / Other", color: "#ffcc00" } // Yellow
         };
 
         let userLabels = JSON.parse(localStorage.getItem('calendarLabels')) || defaultLabels;
@@ -675,12 +681,12 @@
             document.documentElement.style.setProperty('--color-exam', userLabels.exam.color);
             document.documentElement.style.setProperty('--color-health', userLabels.health.color);
 
-            // Populate Legend UI
+            // Populate Legend UI (Reordered: Health, Exam, Personal)
             const legendContainer = document.getElementById('calendar-legend');
             legendContainer.innerHTML = `
-                <div class="legend-item"><div class="legend-color" style="background-color: ${userLabels.personal.color}; box-shadow: 0 0 8px ${userLabels.personal.color}80;"></div>${userLabels.personal.name}</div>
-                <div class="legend-item"><div class="legend-color" style="background-color: ${userLabels.exam.color}; box-shadow: 0 0 8px ${userLabels.exam.color}80;"></div>${userLabels.exam.name}</div>
                 <div class="legend-item"><div class="legend-color" style="background-color: ${userLabels.health.color}; box-shadow: 0 0 8px ${userLabels.health.color}80;"></div>${userLabels.health.name}</div>
+                <div class="legend-item"><div class="legend-color" style="background-color: ${userLabels.exam.color}; box-shadow: 0 0 8px ${userLabels.exam.color}80;"></div>${userLabels.exam.name}</div>
+                <div class="legend-item"><div class="legend-color" style="background-color: ${userLabels.personal.color}; box-shadow: 0 0 8px ${userLabels.personal.color}80;"></div>${userLabels.personal.name}</div>
             `;
 
             // Update Select Options dynamically without changing HTML structure natively
@@ -804,7 +810,7 @@
                 document.getElementById('deleteEventBtn').style.visibility = 'visible'; // Keep spacing layout intact
             } else {
                 document.getElementById('eventTitle').value = '';
-                document.getElementById('eventType').value = 'personal';
+                document.getElementById('eventType').value = 'health'; // Changed default to match new order if needed, or leave personal
                 document.getElementById('deleteEventBtn').style.visibility = 'hidden';
             }
             
@@ -884,16 +890,6 @@
         // Initialize Call
         applyLabels();
         renderCalendar();
-
-        // SERVICE WORKER REGISTRATION
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW Registered!', reg))
-                    .catch(err => console.error('SW Registration Failed:', err));
-            });
-        }
-        
     </script>
 </body>
 </html>
